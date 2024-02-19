@@ -6,24 +6,37 @@
 /*   By: phudyka <phudyka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 16:53:19 by phudyka           #+#    #+#             */
-/*   Updated: 2024/02/05 16:57:22 by phudyka          ###   ########.fr       */
+/*   Updated: 2024/02/19 17:37:42 by phudyka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "PMergeMe.hpp"
+#include "PmergeMe.hpp"
 
-int	main(int argc, char **argv)
+int main(int argc, char* argv[])
 {
-    if (argc < 2)
+    try {
+        std::deque<int> inputSequence;
+
+        if (argc < 2)
+            throw std::invalid_argument("Error: Insufficient arguments");
+        for (int i = 1; i < argc; ++i)
+		{
+            int	num;
+            std::istringstream(argv[i]) >> num;
+            if (std::istringstream(argv[i]).fail())
+                throw std::invalid_argument("Error: Invalid argument - not an integer");
+            inputSequence.push_back(num);
+        }
+        PmergeMe pmergeMe(inputSequence);
+        pmergeMe.displaySequence();
+        pmergeMe.mergeInsertSort();
+        pmergeMe.displaySequence();
+
+    }
+	catch (const std::exception& e)
 	{
-        std::cerr << "Usage: " << argv[0] << " <int1> <int2> ... <intN>" << std::endl;
+        std::cerr << e.what() << std::endl;
         return (1);
     }
-    std::vector<int> inputSequence;
-    for (int i = 1; i < argc; ++i)
-        inputSequence.push_back(std::atoi(argv[i]));
-    PMergeMe pMergeMe;
-    pMergeMe.processSequence(inputSequence);
-
     return (0);
 }

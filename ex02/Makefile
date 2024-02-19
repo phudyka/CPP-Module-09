@@ -6,17 +6,17 @@
 #    By: phudyka <phudyka@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/23 11:49:28 by phudyka           #+#    #+#              #
-#    Updated: 2024/02/05 16:57:36 by phudyka          ###   ########.fr        #
+#    Updated: 2024/02/19 12:35:55 by phudyka          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-TARGET = PMergeMe
+TARGET = PmergeMe
 
 CXX = c++
 
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98
 
-SRCS = main.cpp PMergeMe.cpp 
+SRCS = main.cpp PmergeMe.cpp 
 
 OBJS = $(SRCS:.cpp=.o)
 
