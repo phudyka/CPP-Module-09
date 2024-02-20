@@ -6,7 +6,7 @@
 /*   By: phudyka <phudyka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 11:11:18 by phudyka           #+#    #+#             */
-/*   Updated: 2024/02/02 11:32:52 by phudyka          ###   ########.fr       */
+/*   Updated: 2024/02/20 11:47:21 by phudyka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,83 +16,82 @@ BitcoinExchange::BitcoinExchange() {}
 
 BitcoinExchange::~BitcoinExchange() {}
 
-BitcoinExchange::BitcoinExchange(const BitcoinExchange &src)
+BitcoinExchange::BitcoinExchange(const BitcoinExchange &copy)
 {
-    *this = src;
+    *this = copy;
 }
 
-BitcoinExchange &BitcoinExchange::operator=(const BitcoinExchange &rhs)
+BitcoinExchange	&BitcoinExchange::operator=(const BitcoinExchange &copy)
 {
-    if (this != &rhs)
-	{
-        this->bitcoinData = rhs.bitcoinData;
-        this->inputData = rhs.inputData;
-    }
-    return (*this);
+    if (this != &copy)
+        this->_data = copy._data;
+    return *this;
 }
 
-void	BitcoinExchange::parseBitcoinData(const std::string &filename)
+void	BitcoinExchange::push(const std::string &date, const std::string &price)
 {
-    char	delim;
-    float	value;
-    std::string	date;
-    std::string	line;
-    std::ifstream	file(filename.c_str());
-
-	if (!file.is_open())
-	{
-        std::cerr << "Error: could not open file." << std::endl;
-        return ;
-    }
-    while (std::getline(file, line))
-	{
-        std::istringstream iss(line);
-        if (iss >> date >> delim >> value)
-            bitcoinData[date] = value;
-    }
-    file.close();
+    this->_data.insert(std::make_pair(date, atof(price.c_str())));
 }
 
-void	BitcoinExchange::parseInputData(const std::string &filename)
+void	BitcoinExchange::pop(const std::string &date)
 {
-    char	delim;
-    float	value;
-    std::string	date;
-    std::string	line;
-    std::ifstream	file(filename.c_str());
-
-    if (!file.is_open())
-	{
-		std::cerr << "Error: could not open file." << std::endl;
-		return ;
-    }
-    while (std::getline(file, line))
-	{
-        std::istringstream iss(line);
-        if (iss >> date >> delim >> value)
-            inputData.push_back(std::make_pair(date, value));
-    }
-    file.close();
+    if (!validDate(date))
+        return;
+    this->_data.erase(date);
 }
 
-void	BitcoinExchange::processData()
+float	BitcoinExchange::calculatePrice(const std::string &date, float amount)
 {
-    for (size_t i = 0; i < inputData.size(); ++i)
+    std::map<std::string, float>::iterator pair = this->_data.lower_bound(date);
+
+    if (pair == this->_data.end())
 	{
-        std::string date = inputData[i].first;
-		float value = inputData[i].second;
-        float bitcoinValue = getBitcoinValue(date);
-        if (bitcoinValue == -1.0f)
-            std::cerr << "Error: not a positive number." << std::endl;
-        else
-            std::cout << date << " => " << value << " = " << (bitcoinValue * value) << std::endl;
+        std::cerr << "Error: Out of range" << std::endl;
+        return 0;
     }
+    return (amount * pair->second);
 }
 
-float BitcoinExchange::getBitcoinValue(const std::string &date) const
+bool	validDate(const std::string &date)
 {
-    std::map<std::string, float>::const_iterator it = bitcoinData.find(date);
-    if (it != bitcoinData.end())
-        return (it->second);
-    return -1.0f;
+    if (date.length() != 10)
+	{
+        std::cerr << "Invalid date format" << std::endl;
+        return false;
+    }
+    int year = atoi(date.substr(0, 4).c_str());
+    int month = atoi(date.substr(5, 2).c_str());
+    int day = atoi(date.substr(8, 2).c_str());
+    if (year < 2009 || year > 2022 || month < 1 || month > 12 || day < 1 || day > 31)
+	{
+        std::cerr << "Error: invalid date value" << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool	validPrice(const std::string &price)
+{
+    float num = 0;
+
+    try
+	{
+        num = atof(price.c_str());
+    }
+	catch (const std::out_of_range &e)
+	{
+        std::cerr << "Error: Out of range" << std::endl;
+        return false;
+    }
+    if (num < 0)
+	{
+        std::cerr << "Error: Negative value" << std::endl;
+        return false;
+    }
+    if (num > 1000)
+	{
+        std::cerr << "Error: Value too large" << std::endl;
+        return false;
+    }
+    return true;
 }

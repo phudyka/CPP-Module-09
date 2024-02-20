@@ -6,11 +6,11 @@
 #    By: phudyka <phudyka@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/23 11:49:28 by phudyka           #+#    #+#              #
-#    Updated: 2024/02/02 11:33:38 by phudyka          ###   ########.fr        #
+#    Updated: 2024/02/20 10:16:23 by phudyka          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-TARGET = BitcoinExchange
+TARGET = btc
 
 CXX = c++
 

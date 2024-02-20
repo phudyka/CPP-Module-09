@@ -6,7 +6,7 @@
 /*   By: phudyka <phudyka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 15:03:28 by phudyka           #+#    #+#             */
-/*   Updated: 2024/02/05 16:50:50 by phudyka          ###   ########.fr       */
+/*   Updated: 2024/02/20 11:04:48 by phudyka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 RPN::RPN() {}
 
+RPN::~RPN() {}
+
 RPN::RPN(const RPN &src)
 {
     *this = src;
 }
-
-RPN::~RPN() {}
 
 RPN &RPN::operator=(const RPN &rhs)
 {
@@ -62,23 +62,21 @@ void RPN::performOperation(char op)
         std::cerr << "Error: Insufficient operands for operation" << std::endl;
         return ;
     }
-
-    int operand2 = operands.top();
+    int	operand2 = operands.top();
     operands.pop();
-    int operand1 = operands.top();
+    int	operand1 = operands.top();
     operands.pop();
-
     switch (op)
 	{
         case '+':
             operands.push(operand1 + operand2);
-            break;
+            break ;
         case '-':
             operands.push(operand1 - operand2);
-            break;
+            break ;
         case '*':
             operands.push(operand1 * operand2);
-            break;
+            break ;
         case '/':
             if (operand2 == 0)
 			{
@@ -86,7 +84,7 @@ void RPN::performOperation(char op)
                 return ;
             }
             operands.push(operand1 / operand2);
-            break;
+            break ;
         default:
             std::cerr << "Error: Invalid operator - " << op << std::endl;
     }
