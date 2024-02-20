@@ -6,74 +6,131 @@
 /*   By: phudyka <phudyka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 16:56:03 by phudyka           #+#    #+#             */
-/*   Updated: 2024/02/20 11:28:44 by phudyka          ###   ########.fr       */
+/*   Updated: 2024/02/20 15:05:16 by phudyka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PmergeMe.hpp"
 
-PmergeMe::PmergeMe(const std::deque<int>& inputSequence)
-    : dequeContainer(inputSequence.begin(), inputSequence.end()), listContainer(inputSequence.begin(), inputSequence.end()) {}
-
-void	PmergeMe::mergeInsertSort()
+PmergeMe::PmergeMe(int argc, char **argv)
 {
-    startDeque = std::clock();
-    std::sort(dequeContainer.begin(), dequeContainer.end());
-    endDeque = std::clock();
-
-    startList = std::clock();
-    listContainer.sort();
-    endList = std::clock();
-
-    displayTimeForDeque();
-    displayTimeForList();
+    fillContainers(argc, argv);
+    printBefore();
+    performSortAndMeasureTime();
+    printAfter();
+    printResult();
 }
 
-void	PmergeMe::merge(std::list<int>::iterator listBegin, std::list<int>::iterator listEnd,
-                     std::deque<int>::iterator dequeBegin, std::deque<int>::iterator dequeEnd)
+void PmergeMe::mergeInsertSortDeque(std::deque<int> &arr)
 {
-    while (listBegin != listEnd && dequeBegin != dequeEnd)
-	{
-        if (*listBegin < *dequeBegin)
-		{
-            insert(dequeBegin, *listBegin);
-            ++listBegin;
+    std::deque<int>::iterator it1, it2;
+    for (it1 = arr.begin() + 1; it1 != arr.end(); ++it1)
+    {
+        int temp = *it1;
+        it2 = it1;
+        while (it2 != arr.begin())
+        {
+            std::deque<int>::iterator prevIt = it2;
+            std::advance(prevIt, -1);
+
+            if (*prevIt > temp)
+            {
+                *it2 = *prevIt;
+                it2 = prevIt;
+            }
+            else
+                break;
         }
-		else
-            ++dequeBegin;
-    }
-    while (listBegin != listEnd)
-	{
-        insert(dequeEnd, *listBegin);
-        ++listBegin;
+        *it2 = temp;
     }
 }
 
-void	PmergeMe::insert(std::deque<int>::iterator dequeInsertPos, int value)
+void PmergeMe::mergeInsertSortList(std::list<int> &arr)
 {
-    dequeContainer.insert(dequeInsertPos, value);
+    std::list<int>::iterator it1, it2;
+    for (it1 = ++arr.begin(); it1 != arr.end(); ++it1)
+    {
+        int temp = *it1;
+        it2 = it1;
+        while (it2 != arr.begin())
+        {
+            std::list<int>::iterator prevIt = it2;
+            std::advance(prevIt, -1);
+
+            if (*prevIt > temp)
+            {
+                *it2 = *prevIt;
+                it2 = prevIt;
+            }
+            else
+                break;
+        }
+        *it2 = temp;
+    }
 }
 
-void	PmergeMe::displaySequence() const
+void PmergeMe::fillContainers(int argc, char **argv)
+{
+    srand(time(NULL));
+    for (int i = 1; i < argc; ++i)
+    {
+        int value = atoi(argv[i]);
+        if (value <= 0)
+        {
+            std::cerr << "Error: Invalid input value \"" << argv[i] << "\". Only positive integers are allowed." << std::endl;
+            exit(1);
+        }
+        inputDeque.push_back(value);
+        inputList.push_back(value);
+    }
+}
+
+void PmergeMe::printBefore()
 {
     std::cout << "Before: ";
-    for (std::deque<int>::const_iterator it = dequeContainer.begin(); it != dequeContainer.end(); ++it)
-        std::cout << *it << " ";
-    std::cout << std::endl;
+    display(inputDeque);
+}
+
+void PmergeMe::printAfter()
+{
     std::cout << "After: ";
-    for (std::list<int>::const_iterator it = listContainer.begin(); it != listContainer.end(); ++it)
+    display(inputDeque);
+}
+
+void PmergeMe::performSortAndMeasureTime()
+{
+    clock_t start1 = clock();
+    mergeInsertSortDeque(inputDeque);
+    clock_t end1 = clock();
+    double time1 = static_cast<double>(end1 - start1) / CLOCKS_PER_SEC * 1000;
+
+    clock_t start2 = clock();
+    mergeInsertSortList(inputList);
+    clock_t end2 = clock();
+    double time2 = static_cast<double>(end2 - start2) / CLOCKS_PER_SEC * 1000;
+
+    printSortingTime(time1, "std::deque");
+    printSortingTime(time2, "std::list");
+}
+
+void PmergeMe::printSortingTime(double time, const std::string &containerType)
+{
+    std::cout << "Time to process a range of " << inputDeque.size() << " elements with " << containerType << " container: " << time << " us" << std::endl;
+}
+
+void PmergeMe::printResult()
+{
+    if (inputDeque == std::deque<int>(inputList.begin(), inputList.end()))
+        std::cout << "The sorted sequences are equal." << std::endl;
+    else
+        std::cout << "The sorted sequences are not equal." << std::endl;
+}
+
+template <typename T>
+void PmergeMe::display(const T &container)
+{
+    typename T::const_iterator it;
+    for (it = container.begin(); it != container.end(); ++it)
         std::cout << *it << " ";
     std::cout << std::endl;
-}
-
-void	PmergeMe::displayTimeForDeque() const
-{
-    std::cout << "Time to process a range of " << dequeContainer.size() << " elements with std::deque : "
-              << (static_cast<double>(endDeque - startDeque) / CLOCKS_PER_SEC) * 1e6 << " us" << std::endl;
-}
-
-void	PmergeMe::displayTimeForList() const
-{
-    std::cout << "Time to process a range of " << listContainer.size() << " elements with std::list : "
-              << (static_cast<double>(endList - startList) / CLOCKS_PER_SEC) * 1e6 << " us" << std::endl;
 }

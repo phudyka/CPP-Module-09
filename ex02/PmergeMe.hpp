@@ -6,39 +6,33 @@
 /*   By: phudyka <phudyka@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/19 12:36:38 by phudyka           #+#    #+#             */
-/*   Updated: 2024/02/20 11:29:36 by phudyka          ###   ########.fr       */
+/*   Updated: 2024/02/20 15:04:20 by phudyka          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PMERGEME_HPP
-#define PMERGEME_HPP
-
 #include <deque>
 #include <list>
+#include <ctime>
+#include <cstdlib>
 #include <iostream>
 #include <algorithm>
-#include <iterator>
-#include <ctime>
-#include <stdexcept>
-#include <sstream>
 
 class PmergeMe
 {
-	public:
-		PmergeMe(const std::deque<int>& inputSequence);
-    void	mergeInsertSort();
-    void	displaySequence() const;
-    void	displayTimeForDeque() const;
-    void	displayTimeForList() const;
+public:
+    PmergeMe(int argc, char **argv);
+    template <typename T>
+    void	display(const T &container);
+    void	mergeInsertSortDeque(std::deque<int> &arr);
+    void	mergeInsertSortList(std::list<int> &arr);
 
-	private:
-    	std::deque<int> dequeContainer;
-    	std::list<int> listContainer;
-    std::clock_t startDeque, endDeque, startList, endList;
-
-    void	merge(std::list<int>::iterator listBegin, std::list<int>::iterator listEnd,
-               std::deque<int>::iterator dequeBegin, std::deque<int>::iterator dequeEnd);
-    void	insert(std::deque<int>::iterator dequeInsertPos, int value);
+private:
+    std::deque<int>	inputDeque;
+    std::list<int>	inputList;
+    void	fillContainers(int argc, char **argv);
+    void	printBefore();
+    void	performSortAndMeasureTime();
+    void	printAfter();
+    void	printSortingTime(double time, const std::string &containerType);
+    void	printResult();
 };
-
-#endif // PMERGEME_HPP
